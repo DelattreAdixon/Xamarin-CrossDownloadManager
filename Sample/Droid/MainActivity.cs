@@ -66,63 +66,65 @@ namespace DownloadExample.Droid
 
             button.Click += delegate {
                 // If already downloading, abort it.
-                if (foo.IsDownloading()) {
+                /*if (foo.IsDownloading()) {
                     foo.AbortDownloading ();
                     button.Text = "Download aborted.";
                     return;
-                }
+                }*/
 
                 button.Text = "Start downloading ...";
 
                 foo.InitializeDownload();
 
-                foo.File.PropertyChanged += (sender, e) => {
-                    System.Diagnostics.Debug.WriteLine("[Property changed] " + e.PropertyName + " -> " + sender.GetType().GetProperty(e.PropertyName).GetValue(sender, null).ToString());
+                foreach (var f in foo.Files) {
+                    f.PropertyChanged += (sender, e) => {
+                        System.Diagnostics.Debug.WriteLine("[Property changed] " + e.PropertyName + " -> " + sender.GetType().GetProperty(e.PropertyName).GetValue(sender, null).ToString());
 
-                    // Update UI text-fields
-                    var downloadFile = ((IDownloadFile)sender);
-                    switch (e.PropertyName) {
-                        case nameof(IDownloadFile.Status):
-                            FindViewById<TextView>(Resource.Id.value_status).Text = downloadFile.Status.ToString();
-                            break;
-                        case nameof(IDownloadFile.StatusDetails):
-                            FindViewById<TextView>(Resource.Id.value_statusdetails).Text = downloadFile.StatusDetails;
-                            break;
-                        case nameof(IDownloadFile.TotalBytesExpected):
-                            FindViewById<TextView>(Resource.Id.value_totalbytesexpected).Text = downloadFile.TotalBytesExpected.ToString();
-                            break;
-                        case nameof(IDownloadFile.TotalBytesWritten):
-                            FindViewById<TextView>(Resource.Id.value_totalbyteswritten).Text = downloadFile.TotalBytesWritten.ToString();
-                            break;
-                    }
-
-                    // Update UI if download-status changed.
-                    if (e.PropertyName == "Status") {
-                        switch (((IDownloadFile)sender).Status) {
-                        case DownloadFileStatus.COMPLETED:
-                        case DownloadFileStatus.FAILED:
-                        case DownloadFileStatus.CANCELED:
-                            button.Text = "Downloading finished.";
-
-                            // Get the path this file was saved to. When you didn't set a custom path, this will be some temporary directory.
-                            var nativeDownloadManager = (DownloadManager)ApplicationContext.GetSystemService (DownloadService);
-                            System.Diagnostics.Debug.WriteLine (nativeDownloadManager.GetUriForDownloadedFile (((DownloadFileImplementation)sender).Id));
-
-                            break;
+                        // Update UI text-fields
+                        var downloadFile = ((IDownloadFile)sender);
+                        switch (e.PropertyName) {
+                            case nameof(IDownloadFile.Status):
+                                //FindViewById<TextView>(Resource.Id.value_status).Text = downloadFile.Status.ToString();
+                                break;
+                            case nameof(IDownloadFile.StatusDetails):
+                                //FindViewById<TextView>(Resource.Id.value_statusdetails).Text = downloadFile.StatusDetails;
+                                break;
+                            case nameof(IDownloadFile.TotalBytesExpected):
+                                //FindViewById<TextView>(Resource.Id.value_totalbytesexpected).Text = downloadFile.TotalBytesExpected.ToString();
+                                break;
+                            case nameof(IDownloadFile.TotalBytesWritten):
+                                //FindViewById<TextView>(Resource.Id.value_totalbyteswritten).Text = downloadFile.TotalBytesWritten.ToString();
+                                break;
                         }
-                    }
 
-                    // Update UI while donwloading.
-                    if (e.PropertyName == "TotalBytesWritten" || e.PropertyName == "TotalBytesExpected") {
-                        var bytesExpected = ((IDownloadFile)sender).TotalBytesExpected;
-                        var bytesWritten = ((IDownloadFile)sender).TotalBytesWritten;
+                        // Update UI if download-status changed.
+                        if (e.PropertyName == "Status") {
+                            switch (((IDownloadFile)sender).Status) {
+                                case DownloadFileStatus.COMPLETED:
+                                case DownloadFileStatus.FAILED:
+                                case DownloadFileStatus.CANCELED:
+                                    button.Text = "Downloading finished.";
 
-                        if (bytesExpected > 0) {
-                            var percentage = Math.Round (bytesWritten / bytesExpected * 100);
-                            button.Text = "Downloading (" + percentage + "%)";
+                                    // Get the path this file was saved to. When you didn't set a custom path, this will be some temporary directory.
+                                    var nativeDownloadManager = (DownloadManager)ApplicationContext.GetSystemService(DownloadService);
+                                    System.Diagnostics.Debug.WriteLine(nativeDownloadManager.GetUriForDownloadedFile(((DownloadFileImplementation)sender).Id));
+
+                                    break;
+                            }
                         }
-                    }
-                };
+
+                        // Update UI while donwloading.
+                        if (e.PropertyName == "TotalBytesWritten" || e.PropertyName == "TotalBytesExpected") {
+                            var bytesExpected = ((IDownloadFile)sender).TotalBytesExpected;
+                            var bytesWritten = ((IDownloadFile)sender).TotalBytesWritten;
+
+                            if (bytesExpected > 0) {
+                                var percentage = Math.Round(bytesWritten / bytesExpected * 100);
+                                button.Text = "Downloading (" + percentage + "%)";
+                            }
+                        }
+                    };
+                }
 
                 foo.StartDownloading(FindViewById<Switch>(Resource.Id.switch1).Checked);
             };

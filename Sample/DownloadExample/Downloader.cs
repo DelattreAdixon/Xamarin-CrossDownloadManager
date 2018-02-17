@@ -7,10 +7,12 @@ namespace DownloadExample
 {
     public class Downloader
     {
-        public IDownloadFile File;
+        //public IDownloadFile File;
+        public List<IDownloadFile> Files = new List<IDownloadFile>();
+
 
         public Downloader()
-        {
+        {  
             CrossDownloadManager.Current.CollectionChanged += (sender, e) => 
                 System.Diagnostics.Debug.WriteLine(
                     "[DownloadManager] " + e.Action +
@@ -23,26 +25,27 @@ namespace DownloadExample
 
         public void InitializeDownload()
         {
-            File = CrossDownloadManager.Current.CreateDownloadFile (
-                "http://ipv4.download.thinkbroadband.com/10MB.zip"
-                // If you need, you can add a dictionary of headers you need.
-                //, new Dictionary<string, string> {
-                //    { "Cookie", "LetMeDownload=1;" },
-                //    { "Authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" }
-                //}
-            );
+
+            for (int i = 0; i < 40; i++) {
+                var file = CrossDownloadManager.Current.CreateDownloadFile("http://via.placeholder.com/350x" + (150 + i));
+                this.Files.Add(file);
+            }
+
         }
 
         public void StartDownloading (bool mobileNetworkAllowed)
         {
-            CrossDownloadManager.Current.Start (File, mobileNetworkAllowed);
+            foreach (var f in Files) {
+                CrossDownloadManager.Current.Start(f, true);
+            }
         }
 
         public void AbortDownloading ()
         {
-            CrossDownloadManager.Current.Abort (File);
+            //CrossDownloadManager.Current.Abort (File);
         }
 
+        /*
         public bool IsDownloading ()
         {
             if (File == null) return false;
@@ -61,7 +64,7 @@ namespace DownloadExample
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
+        }*/
    }
 }
 

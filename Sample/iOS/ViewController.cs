@@ -32,11 +32,13 @@ namespace DownloadExample.iOS
             Button.AccessibilityIdentifier = "myButton";
             Button.TouchUpInside += delegate {
                 // If already downloading, abort it.
+                /*
                 if (foo.IsDownloading ()) {
                     foo.AbortDownloading ();
                     Button.SetTitle ("Download aborted.", UIControlState.Normal);
                     return;
                 }
+                */
 
                 Button.SetTitle ("Start downloading ...", UIControlState.Normal);
 
